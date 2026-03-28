@@ -115,6 +115,40 @@ local function CreateTab(icon, name)
 	return ContentFrame
 end
 
+local function CreateScrollableSection(name, parent)  
+    local Section = UI:Create("Frame", {  
+        Name = "Card",  
+        Size = UDim2.new(1,0,0,200),  -- initial height  
+        BackgroundColor3 = Themes[Theme].Card  
+    }, parent)  
+    UI:Corner(Section,10)  
+    UI:Padding(Section,10)  
+  
+    local Title = UI:Create("TextLabel", {  
+        Text = name,  
+        Size = UDim2.new(1,0,0,18),  
+        BackgroundTransparency = 1,  
+        TextColor3 = Themes[Theme].Text,  
+        Font = Enum.Font.GothamSemibold,  
+        TextSize = 12,  
+        TextXAlignment = Enum.TextXAlignment.Left  
+    }, Section)  
+  
+    -- Scrolling frame for contents  
+    local Scroll = UI:Create("ScrollingFrame", {  
+        Size = UDim2.new(1,0,1,-18),  
+        Position = UDim2.new(0,0,0,18),  
+        BackgroundTransparency = 1,  
+        CanvasSize = UDim2.new(0,0,0,0),  
+        ScrollBarThickness = 6  
+    }, Section)  
+  
+    local List = UI:List(Scroll, 4) -- spacing between labels  
+    List.SortOrder = Enum.SortOrder.LayoutOrder  
+  
+    return Scroll  
+end
+
 -- SECTIONS, BUTTONS, TOGGLES, SLIDERS
 local function CreateSection(name, parent)
 	local Section = UI:Create("Frame",{Name="Card",AutomaticSize=Enum.AutomaticSize.Y,Size=UDim2.new(1,0,0,0), BackgroundColor3=Themes[Theme].Card})
@@ -131,27 +165,59 @@ local function CreateButton(parent,text,callback)
 	return Btn
 end
 
-local function CreateToggle(parent,text,callback)
-	local state=false
-	local Holder = UI:Create("Frame",{Size=UDim2.new(1,0,0,40), BackgroundTransparency=1},parent)
-	UI:Create("TextLabel",{Size=UDim2.new(1,-60,1,0), Text=text, BackgroundTransparency=1, TextColor3=Themes[Theme].Text, Font=Enum.Font.Gotham, TextSize=14, TextXAlignment=Enum.TextXAlignment.Left},Holder)
-	local Toggle = UI:Create("Frame",{Size=UDim2.new(0,44,0,22), Position=UDim2.new(1,-44,0.5,-11), BackgroundColor3=Themes[Theme].Button, Active=true},Holder)
-	UI:Corner(Toggle,20)
-	local Circle = UI:Create("Frame",{Size=UDim2.new(0,18,0,18), Position=UDim2.new(0,2,0.5,-9), BackgroundColor3=(Theme=="Light" and Color3.new(0,0,0) or Color3.new(1,1,1))},Toggle)
-	UI:Corner(Circle,20)
-	local function update()
-		TweenService:Create(Circle, TweenInfo.new(0.15), {Position=state and UDim2.new(1,-20,0.5,-9) or UDim2.new(0,2,0.5,-9)}):Play()
-		Toggle.BackgroundColor3=state and Themes[Theme].Accent or Themes[Theme].Button
-	end
-	local function toggleState()
-		state = not state
-		update()
-		callback(state)
-	end
-	Toggle.InputBegan:Connect(function(i)
-		if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then toggleState() end
-	end)
-	update()
+local function CreateToggle(parent, text, callback)
+    local state = false
+    local Holder = UI:Create("Frame",{Size=UDim2.new(1,0,0,40), BackgroundTransparency=1}, parent)
+    
+    local Label = UI:Create("TextLabel",{
+        Size = UDim2.new(1,-60,1,0),
+        Text = text,
+        BackgroundTransparency = 1,
+        TextColor3 = Themes[Theme].Text,
+        Font = Enum.Font.Gotham,
+        TextSize = 14,
+        TextXAlignment = Enum.TextXAlignment.Left
+    }, Holder)
+    
+    local Toggle = UI:Create("Frame",{
+        Size = UDim2.new(0,44,0,22),
+        Position = UDim2.new(1,-44,0.5,-11),
+        BackgroundColor3 = Themes[Theme].Button,
+        Active = true
+    }, Holder)
+    UI:Corner(Toggle, 20)
+
+    local Circle = UI:Create("Frame",{
+        Size = UDim2.new(0,18,0,18),
+        Position = UDim2.new(0,2,0.5,-9),
+        BackgroundColor3 = (Theme=="Light" and Color3.new(0,0,0) or Color3.new(1,1,1))
+    }, Toggle)
+    UI:Corner(Circle, 20)
+
+    local function update()
+        TweenService:Create(Circle, TweenInfo.new(0.15), {
+            Position = state and UDim2.new(1,-20,0.5,-9) or UDim2.new(0,2,0.5,-9)
+        }):Play()
+        Toggle.BackgroundColor3 = state and Themes[Theme].Accent or Themes[Theme].Button
+    end
+
+    local function toggleState()
+        state = not state
+        update()
+        if callback then callback(state) end
+    end
+
+    Toggle.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            toggleState()
+        end
+    end)
+
+    return {
+        Set = function(v) state = v; update() end,
+        Get = function() return state end,
+        Holder = Holder
+    }
 end
 
 function CreateTextBox(parent, placeholder)
@@ -182,34 +248,70 @@ function CreateLabel(parent, text)
     return lbl
 end
 
-local function CreateSlider(parent,text,min,max,callback)
-	local value = min
-	local Holder = UI:Create("Frame",{Size=UDim2.new(1,0,0,50), BackgroundTransparency=1, Active=true},parent)
-	local Label = UI:Create("TextLabel",{Size=UDim2.new(1,0,0,20), BackgroundTransparency=1, Text=text.." : "..value, TextColor3=Themes[Theme].Text, Font=Enum.Font.Gotham, TextSize=13, TextXAlignment=Enum.TextXAlignment.Left},Holder)
-	local Bar = UI:Create("Frame",{Size=UDim2.new(1,0,0,6), Position=UDim2.new(0,0,1,-10), BackgroundColor3=(Theme=="Light" and Color3.new(0,0,0) or Themes[Theme].Button), Active=true},Holder)
-	UI:Corner(Bar,10)
-	local Fill = UI:Create("Frame",{Size=UDim2.new(0,0,1,0), BackgroundColor3=Themes[Theme].Accent},Bar)
-	UI:Corner(Fill,10)
-	local dragging=false
-	local function set(x)
-		local percent = math.clamp((x - Bar.AbsolutePosition.X)/Bar.AbsoluteSize.X,0,1)
-		value = math.floor(min+(max-min)*percent)
-		Fill.Size = UDim2.new(percent,0,1,0)
-		Label.Text = text.." : "..value
-		callback(value)
-	end
-	Bar.InputBegan:Connect(function(i)
-		if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
-			dragging=true
-			set(i.Position.X)
-		end
-	end)
-	UIS.InputChanged:Connect(function(i)
-		if dragging and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then set(i.Position.X) end
-	end)
-	UIS.InputEnded:Connect(function(i)
-		if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dragging=false end
-	end)
+local function CreateSlider(parent, text, min, max, callback)
+    local value = min
+    local dragging = false
+
+    local Holder = UI:Create("Frame",{Size=UDim2.new(1,0,0,50), BackgroundTransparency=1, Active=true}, parent)
+    local Label = UI:Create("TextLabel",{
+        Size=UDim2.new(1,0,0,20),
+        BackgroundTransparency=1,
+        Text=text.." : "..value,
+        TextColor3=Themes[Theme].Text,
+        Font=Enum.Font.Gotham,
+        TextSize=13,
+        TextXAlignment=Enum.TextXAlignment.Left
+    }, Holder)
+
+    local Bar = UI:Create("Frame",{
+        Size=UDim2.new(1,0,0,6),
+        Position=UDim2.new(0,0,1,-10),
+        BackgroundColor3=(Theme=="Light" and Color3.new(0,0,0) or Themes[Theme].Button),
+        Active=true
+    }, Holder)
+    UI:Corner(Bar,10)
+
+    local Fill = UI:Create("Frame",{Size=UDim2.new(0,0,1,0), BackgroundColor3=Themes[Theme].Accent}, Bar)
+    UI:Corner(Fill,10)
+
+    local function set(x)
+        local percent = math.clamp((x - Bar.AbsolutePosition.X) / Bar.AbsoluteSize.X, 0, 1)
+        value = min + (max - min) * percent
+        value = math.floor(value)  -- remove this line if you want floats
+        Fill.Size = UDim2.new(percent,0,1,0)
+        Label.Text = text.." : "..value
+        if callback then callback(value) end
+    end
+
+    Bar.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            set(i.Position.X)
+        end
+    end)
+
+    UIS.InputChanged:Connect(function(i)
+        if dragging and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
+            set(i.Position.X)
+        end
+    end)
+
+    UIS.InputEnded:Connect(function(i)
+        if dragging and (i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch) then
+            dragging = false
+        end
+    end)
+
+    return {
+        Holder = Holder,
+        Get = function() return value end,
+        Set = function(v)
+            value = math.clamp(v,min,max)
+            local percent = (value - min)/(max - min)
+            Fill.Size = UDim2.new(percent,0,1,0)
+            Label.Text = text.." : "..value
+        end
+    }
 end
 
 function SelectDefaultTab(Tab)
@@ -293,5 +395,6 @@ return {
     CreateSlider = CreateSlider,
     CreateTextBox = CreateTextBox,
     SelectDefaultTab = SelectDefaultTab,
+    CreateScrollSection = CreateScrollableSection,
     notify = notify
 }
