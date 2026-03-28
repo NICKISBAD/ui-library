@@ -265,18 +265,19 @@ local function CreateDropdown(parent, text, options, callback)
         ClipsDescendants = true,
         Visible = true,
         ZIndex = 5
-    }, Holder)
+    }, ScreenGui)
     UI:Corner(DropFrame, 8)
 
     local List = UI:List(DropFrame, 4)
     UI:Padding(DropFrame, 6)
 
     local function refreshSize()
-        local count = #options
-        local target = opened and (count * 30 + 12) or 0
-        TweenService:Create(DropFrame, TweenInfo.new(0.2), {
-            Size = UDim2.new(1,0,0,target)
-        }):Play()
+	    local count = #options
+	    local target = opened and math.clamp(count * 30 + 12, 0, 200) or 0 -- 👈 max height
+	
+	    TweenService:Create(DropFrame, TweenInfo.new(0.2), {
+	        Size = UDim2.new(DropFrame.Size.X.Scale, DropFrame.Size.X.Offset, 0, target)
+	    }):Play()
     end
 
     for _,opt in ipairs(options) do
@@ -300,9 +301,19 @@ local function CreateDropdown(parent, text, options, callback)
     end
 
     Button.MouseButton1Click:Connect(function()
-        opened = not opened
-        refreshSize()
-    end)
+	    opened = not opened
+	
+	    if opened then
+	        local absPos = Button.AbsolutePosition
+	        local absSize = Button.AbsoluteSize
+	
+	        DropFrame.Position = UDim2.new(0, absPos.X, 0, absPos.Y + absSize.Y)
+	        DropFrame.Size = UDim2.new(0, absSize.X, 0, 0)
+	        DropFrame.Visible = true
+	    end
+	
+	    refreshSize()
+	end)
 
     return {
         Get = function() return selected end,
