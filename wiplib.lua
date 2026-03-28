@@ -1,4 +1,4 @@
-function task.wait() until game:IsLoaded()
+repeat task.wait() until game:IsLoaded()
 
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -218,7 +218,7 @@ end
 
 -- NOTIFICATIONS
 local notifications = {}
-function Notify(text,color)
+function notify(text,color)
 	color = color or Themes[Theme].Accent
 	local notif = UI:Create("Frame", {Size=UDim2.new(0,220,0,40), BackgroundColor3=Themes[Theme].Card, AnchorPoint=Vector2.new(1,1), Position=UDim2.new(1,20,1,20), ZIndex=10}, ScreenGui)
 	UI:Corner(notif, 8)
@@ -292,5 +292,6 @@ return {
     CreateToggle = CreateToggle,
     CreateSlider = CreateSlider,
     CreateTextBox = CreateTextBox,
-    SelectDefaultTab = SelectDefaultTab
+    SelectDefaultTab = SelectDefaultTab,
+    notif = notify
 }
