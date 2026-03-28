@@ -86,6 +86,7 @@ local SidebarWidth = 50
 local Sidebar = UI:Create("Frame", {Size = UDim2.new(0, SidebarWidth, 1, -40), Position = UDim2.new(0,0,0,40), BackgroundTransparency = 1}, Main)
 UI:List(Sidebar,6)
 local Tabs = {}
+local CurrentTab
 
 local function CreateTab(icon, name)
 	local Btn = UI:Create("TextButton", {
@@ -110,6 +111,7 @@ local function CreateTab(icon, name)
 	Btn.MouseButton1Click:Connect(function()
 		for _,f in pairs(Tabs) do f.Visible = false end
 		ContentFrame.Visible = true
+		CurrentTab = ContentFrame
 	end)
 
 	return ContentFrame
