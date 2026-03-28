@@ -499,6 +499,7 @@ return {
     CreateButton = CreateButton,
     CreateToggle = CreateToggle,
     CreateSlider = CreateSlider,
+    CreateLabel = CreateLabel,
     CreateTextBox = CreateTextBox,
     SelectDefaultTab = SelectDefaultTab,
     CreateScrollSection = CreateScrollableSection,
