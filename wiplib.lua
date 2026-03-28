@@ -293,5 +293,5 @@ return {
     CreateSlider = CreateSlider,
     CreateTextBox = CreateTextBox,
     SelectDefaultTab = SelectDefaultTab,
-    notif = notify
+    notify = notify
 }
