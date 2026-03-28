@@ -253,7 +253,8 @@ local function CreateDropdown(parent, text, options, callback)
         Text = text .. ": " .. selected,
         TextColor3 = Themes[Theme].Text,
         Font = Enum.Font.GothamSemibold,
-        TextSize = 14
+        TextSize = 14,
+        ZIndex = 5
     }, Holder)
     UI:Corner(Button, 8)
 
@@ -262,7 +263,8 @@ local function CreateDropdown(parent, text, options, callback)
         Position = UDim2.new(0,0,0,38),
         BackgroundColor3 = Themes[Theme].Card,
         ClipsDescendants = true,
-        Visible = true
+        Visible = true,
+        ZIndex = 5
     }, Holder)
     UI:Corner(DropFrame, 8)
 
