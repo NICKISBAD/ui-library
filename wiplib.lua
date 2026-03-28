@@ -254,6 +254,7 @@ local function CreateDropdown(parent, text, options, callback)
         TextColor3 = Themes[Theme].Text,
         Font = Enum.Font.GothamSemibold,
         TextSize = 14,
+        ZIndex = 5
     }, Holder)
     UI:Corner(Button, 8)
 
