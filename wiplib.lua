@@ -86,76 +86,68 @@ local SidebarWidth = 50
 local Sidebar = UI:Create("Frame", {Size = UDim2.new(0, SidebarWidth, 1, -40), Position = UDim2.new(0,0,0,40), BackgroundTransparency = 1}, Main)
 UI:List(Sidebar,6)
 local Tabs = {}
+
 local function CreateTab(icon, name)
-    local Btn = UI:Create("TextButton", {
-        Size = UDim2.new(1,0,0,50),
-        BackgroundColor3 = Themes[Theme].Button,
-        Text = icon,
-        TextColor3 = Themes[Theme].Text,
-        Font = Enum.Font.GothamBold,
-        TextSize = 20
-    }, Sidebar)
-    UI:Corner(Btn,8)
+	local Btn = UI:Create("TextButton", {
+		Size = UDim2.new(1,0,0,50),
+		BackgroundColor3 = Themes[Theme].Button,
+		Text = icon,
+		TextColor3 = Themes[Theme].Text,
+		Font = Enum.Font.GothamBold,
+		TextSize = 20
+	}, Sidebar)
+	UI:Corner(Btn,8)
 
-    -- This is the main container for all sections of this tab
-    local TabContainer = UI:Create("Frame", {
-        Size = UDim2.new(1,-SidebarWidth,1,0),
-        Position = UDim2.new(0,SidebarWidth,0,40),
-        BackgroundTransparency = 1,
-        ClipsDescendants = true
-    }, Main)
+	local ContentFrame = UI:Create("Frame", {
+		Size = UDim2.new(1,-SidebarWidth,1,0),
+		Position = UDim2.new(0,SidebarWidth,0,40),
+		BackgroundTransparency = 1,
+		Visible = false
+	}, Main)
 
-    local Layout = UI:List(TabContainer, 8) -- vertical layout for multiple sections
-    Layout.SortOrder = Enum.SortOrder.LayoutOrder
+	Tabs[Btn] = ContentFrame
 
-    Tabs[Btn] = TabContainer
+	Btn.MouseButton1Click:Connect(function()
+		for _,f in pairs(Tabs) do f.Visible = false end
+		ContentFrame.Visible = true
+	end)
 
-    Btn.MouseButton1Click:Connect(function()
-        for _,f in pairs(Tabs) do f.Visible = false end
-        TabContainer.Visible = true
-        CurrentTab = TabContainer
-    end)
-
-    return TabContainer
+	return ContentFrame
 end
-local function CreateScrollableSection(name, parent)
-    -- Container frame for the section
-    local Section = UI:Create("Frame", {
-        Name = "Card",
-        Size = UDim2.new(1,0,0,50), -- start small; will grow
-        AutomaticSize = Enum.AutomaticSize.Y,
-        BackgroundColor3 = Themes[Theme].Card
-    }, parent)
-    UI:Corner(Section, 10)
-    UI:Padding(Section, 10)
 
-    -- Title
-    local Title = UI:Create("TextLabel", {
-        Text = name,
-        Size = UDim2.new(1,0,0,18),
-        BackgroundTransparency = 1,
-        TextColor3 = Themes[Theme].Text,
-        Font = Enum.Font.GothamSemibold,
-        TextSize = 12,
-        TextXAlignment = Enum.TextXAlignment.Left
-    }, Section)
-
-    -- Scrolling frame for dynamic content
-    local Scroll = UI:Create("ScrollingFrame", {
-        Size = UDim2.new(1,0,0,0), -- will expand automatically
-        Position = UDim2.new(0,0,0,18),
-        BackgroundTransparency = 1,
-        CanvasSize = UDim2.new(0,0,0,0),
+local function CreateScrollableSection(name, parent)  
+    local Section = UI:Create("Frame", {  
+        Name = "Card",  
+        Size = UDim2.new(1,0,0,200),  -- initial height  
+        BackgroundColor3 = Themes[Theme].Card  
+    }, parent)  
+    UI:Corner(Section,10)  
+    UI:Padding(Section,10)  
+  
+    local Title = UI:Create("TextLabel", {  
+        Text = name,  
+        Size = UDim2.new(1,0,0,18),  
+        BackgroundTransparency = 1,  
+        TextColor3 = Themes[Theme].Text,  
+        Font = Enum.Font.GothamSemibold,  
+        TextSize = 12,  
+        TextXAlignment = Enum.TextXAlignment.Left  
+    }, Section)  
+  
+    -- Scrolling frame for contents  
+    local Scroll = UI:Create("ScrollingFrame", {  
+        Size = UDim2.new(1,0,1,-18),  
+        Position = UDim2.new(0,0,0,18),  
+        BackgroundTransparency = 1,  
+        CanvasSize = UDim2.new(0,0,0,0),  
         ScrollBarThickness = 6,
         AutomaticCanvasSize = Enum.AutomaticSize.Y
-    }, Section)
-
-    UI:Padding(Scroll, 6)
-    
-    local List = UI:List(Scroll, 4)
-    List.SortOrder = Enum.SortOrder.LayoutOrder
-
-    return Scroll
+    }, Section)  
+	UI:Padding(Scroll, 6)
+    local List = UI:List(Scroll, 4) -- spacing between labels  
+    List.SortOrder = Enum.SortOrder.LayoutOrder  
+  
+    return Scroll  
 end
 
 -- SECTIONS, BUTTONS, TOGGLES, SLIDERS
