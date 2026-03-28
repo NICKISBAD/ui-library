@@ -292,6 +292,5 @@ return {
     CreateToggle = CreateToggle,
     CreateSlider = CreateSlider,
     CreateTextBox = CreateTextBox,
-    SelectDefaultTab = SelectDefaultTab,
-    Notify = Notify
+    SelectDefaultTab = SelectDefaultTab
 }
