@@ -346,12 +346,13 @@ end
 -- Simple helper to create a TextLabel inside a section
 function CreateLabel(parent, text)
     local lbl = Instance.new("TextLabel")
-    lbl.Size = UDim2.new(1, 0, 0, 25)
+    lbl.Size = UDim2.new(1, 0, 0, 38)
     lbl.BackgroundTransparency = 1
     lbl.TextXAlignment = Enum.TextXAlignment.Left
-    lbl.TextSize = 18
-    lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+    lbl.TextSize = 14
+    lbl.TextColor3 = Themes[Theme].Text
     lbl.Text = text
+    lbl.Font = Enum.Font.GothamSemibold
     lbl.Parent = parent
     return lbl
 end
