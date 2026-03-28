@@ -238,6 +238,109 @@ function CreateTextBox(parent, placeholder)
     return Box
 end
 
+local function CreateDropdown(parent, text, options, callback)
+    local opened = false
+    local selected = options[1] or "None"
+
+    local Holder = UI:Create("Frame", {
+        Size = UDim2.new(1,0,0,40),
+        BackgroundTransparency = 1
+    }, parent)
+
+    local Button = UI:Create("TextButton", {
+        Size = UDim2.new(1,0,0,36),
+        BackgroundColor3 = Themes[Theme].Button,
+        Text = text .. ": " .. selected,
+        TextColor3 = Themes[Theme].Text,
+        Font = Enum.Font.GothamSemibold,
+        TextSize = 14
+    }, Holder)
+    UI:Corner(Button, 8)
+
+    local DropFrame = UI:Create("Frame", {
+        Size = UDim2.new(1,0,0,0),
+        Position = UDim2.new(0,0,0,38),
+        BackgroundColor3 = Themes[Theme].Card,
+        ClipsDescendants = true,
+        Visible = true
+    }, Holder)
+    UI:Corner(DropFrame, 8)
+
+    local List = UI:List(DropFrame, 4)
+    UI:Padding(DropFrame, 6)
+
+    local function refreshSize()
+        local count = #options
+        local target = opened and (count * 30 + 12) or 0
+        TweenService:Create(DropFrame, TweenInfo.new(0.2), {
+            Size = UDim2.new(1,0,0,target)
+        }):Play()
+    end
+
+    for _,opt in ipairs(options) do
+        local OptBtn = UI:Create("TextButton", {
+            Size = UDim2.new(1,0,0,26),
+            BackgroundColor3 = Themes[Theme].Button,
+            Text = opt,
+            TextColor3 = Themes[Theme].Text,
+            Font = Enum.Font.Gotham,
+            TextSize = 13
+        }, DropFrame)
+        UI:Corner(OptBtn, 6)
+
+        OptBtn.MouseButton1Click:Connect(function()
+            selected = opt
+            Button.Text = text .. ": " .. selected
+            opened = false
+            refreshSize()
+            if callback then callback(selected) end
+        end)
+    end
+
+    Button.MouseButton1Click:Connect(function()
+        opened = not opened
+        refreshSize()
+    end)
+
+    return {
+        Get = function() return selected end,
+        Set = function(v)
+            if table.find(options, v) then
+                selected = v
+                Button.Text = text .. ": " .. selected
+            end
+        end,
+        Refresh = function(newOptions)
+            options = newOptions
+            DropFrame:ClearAllChildren()
+            UI:List(DropFrame, 4)
+            UI:Padding(DropFrame, 6)
+
+            for _,opt in ipairs(options) do
+                local OptBtn = UI:Create("TextButton", {
+                    Size = UDim2.new(1,0,0,26),
+                    BackgroundColor3 = Themes[Theme].Button,
+                    Text = opt,
+                    TextColor3 = Themes[Theme].Text,
+                    Font = Enum.Font.Gotham,
+                    TextSize = 13
+                }, DropFrame)
+                UI:Corner(OptBtn, 6)
+
+                OptBtn.MouseButton1Click:Connect(function()
+                    selected = opt
+                    Button.Text = text .. ": " .. selected
+                    opened = false
+                    refreshSize()
+                    if callback then callback(selected) end
+                end)
+            end
+
+            refreshSize()
+        end
+    }
+end
+
 -- Simple helper to create a TextLabel inside a section
 function CreateLabel(parent, text)
     local lbl = Instance.new("TextLabel")
@@ -350,8 +453,6 @@ function notify(text,color)
 	end)
 end
 
--- store the currently active tab
-
 -- TOPBAR BUTTONS
 local minimized=false
 local normalSize = Main.Size
@@ -399,5 +500,6 @@ return {
     CreateTextBox = CreateTextBox,
     SelectDefaultTab = SelectDefaultTab,
     CreateScrollSection = CreateScrollableSection,
+    CreateDropdown = CreateDropdown,
     notify = notify
 }
