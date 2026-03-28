@@ -140,9 +140,12 @@ local function CreateScrollableSection(name, parent)
         Position = UDim2.new(0,0,0,18),  
         BackgroundTransparency = 1,  
         CanvasSize = UDim2.new(0,0,0,0),  
-        ScrollBarThickness = 6  
-    }, Section)  
-  
+        ScrollBarThickness = 6,
+        AutomaticCanvasSize = Enum.AutomaticSize.Y
+    }, Section)
+    
+	UI:Padding(Scroll, 6)
+	
     local List = UI:List(Scroll, 4) -- spacing between labels  
     List.SortOrder = Enum.SortOrder.LayoutOrder  
   
